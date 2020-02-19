@@ -16,6 +16,14 @@ def requisicao(url, pagina):
 
 
 def inserir(colecao, id, conteudo):
+    """
+    Parâmetros:
+    colecao (MongoDB Collection)
+    id (int)
+    conteudo (set)
+
+    retorna o id do documento inserido
+    """
     resposta = colecao.find_one({"_id": id})
     if resposta is None:
         # elemento com id informado não existe no banco, inserir
@@ -33,6 +41,17 @@ def inserir(colecao, id, conteudo):
 
 
 def alterar(colecao, busca, alterado):
+    """
+    Parãmetros:
+    colecao (MongoDB Collection)
+    busca (json)
+    alterado (json)
+
+    Altera um documento já existente no banco
+    localiza o campo correto pelo parâmetro de busca
+
+    retorna o conteúdo do campo alterado
+    """
     resposta = colecao.find_one(busca)
     if resposta is None:
         # elemento não encontrado, não alterar nada e retornar none
