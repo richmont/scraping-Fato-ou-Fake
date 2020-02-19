@@ -20,7 +20,7 @@ def inserir(colecao, id, conteudo):
     Parâmetros:
     colecao (MongoDB Collection)
     id (int)
-    conteudo (set)
+    conteudo (json)
 
     retorna o id do documento inserido
     """
@@ -71,7 +71,7 @@ if dados is not None:
     print("dados válidos 59")
 
 """
-#controle = {"_id": 1, "pagina_mais_antiga": 60}
+# controle = {"_id": 1, "pagina_mais_antiga": 60}
 local = "mongodb://python:penis@localhost"
 cliente = MongoClient(local)
 banco = cliente.fato_ou_fake
@@ -82,7 +82,7 @@ if resultado is None:
     print("erro")
 else:
     print(resultado)
-    
+
 """
 busca = {"_id": 1}
 alterado = {"pagina_mais_antiga": 59}
@@ -94,4 +94,3 @@ else:
 """
 # inserir(colecao, 22, "fodase")
 # id_insert = colecao.insert_one(controle).inserted_id
-
