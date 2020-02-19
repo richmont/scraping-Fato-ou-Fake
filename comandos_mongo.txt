@@ -1,0 +1,2 @@
+db.createUser({user: "python", pwd: "<senha>>", roles: [{role: "readWrite", db: "fato_ou_fake"}]})
+db.createUser({user: "root", pwd: "<senha>", roles: ["root]})
