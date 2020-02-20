@@ -9,7 +9,7 @@ def requisicao(url, **pagina):
         omitindo a verificação do elemento items,
         para funciona com qualquer requisição
         """
-        url = url + str(pagina)
+        url = url + str(pagina["pagina"])
         resposta = requests.get(url)
         json_data = json.loads(resposta.text)
         # tamanho_resposta = len(json_data["items"])
@@ -34,6 +34,7 @@ json_file = open("33.json","r")
 dados = json.load(json_file)
 for post in dados["items"]:
     print("Título: ", post["content"]["title"])
+    print("Resumo: ", post["content"]["summary"])
 
 como acessar o titulo do primeiro post coletado
 dados["items"][0]["content"]["title"]
