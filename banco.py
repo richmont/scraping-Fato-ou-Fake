@@ -62,6 +62,38 @@ def alterar(colecao, busca, alterado):
         return resultado
 
 
+def lista_chave_banco(colecao, chave, chave_interna):
+    """
+    colecao (MongoDB Collection)
+    chave (str)
+    chave_interna (str)
+
+    Busca no banco o conteúdo de uma chave dentro de outra
+    Por enquanto é o bastante pra colher metadados
+    """
+    # filtra apenas os documentos que contém o campo "items"
+    bruto = colecao.distinct(chave)
+    conteudo = []
+    for x in bruto:
+        # agora pega o conteúdo e passa pra uma lista
+        conteudo.append(x[chave_interna])
+    return conteudo
+
+"""
+local = "mongodb://python:penis@localhost"
+cliente = MongoClient(local)
+banco = cliente.fato_ou_fake
+colecao = banco.dados_brutos
+
+# pegar os ids dos posts
+conteudo = lista_chave_banco(colecao, "items", "id")
+for x in conteudo:
+    print(x)
+"""
+
+
+
+
 """
 dados = requisicao(url, 60)
 if dados is not None:
@@ -72,10 +104,7 @@ if dados is not None:
 
 
 # controle = {"_id": 1, "pagina_mais_antiga": 60}
-local = "mongodb://python:penis@localhost"
-cliente = MongoClient(local)
-banco = cliente.fato_ou_fake
-colecao = banco.dados_brutos
+
 
 
 busca = {"_id": 1}
