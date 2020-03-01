@@ -79,22 +79,55 @@ def lista_chave_banco(colecao, chave, chave_interna):
         conteudo.append(x[chave_interna])
     return conteudo
 
-"""
+
 local = "mongodb://python:penis@localhost"
 cliente = MongoClient(local)
 banco = cliente.fato_ou_fake
-colecao = banco.dados_brutos
+col_dados_brutos = banco.dados_brutos
+col_posts = banco.posts
 
+
+def bruto_json(col_dados_brutos):
+    json_post = {"id": 0}
+    conteudo_bruto1 = lista_chave_banco(col_dados_brutos, "items", "id")
+    for x in conteudo_bruto1:
+        json_id = {"id": x}
+        json_post.update(json_id)
+        break
+    conteudo_bruto2 = lista_chave_banco(col_dados_brutos, "items", "publication")
+    for y in conteudo_bruto2:
+        json_publication = {"publication": y}
+        json_post.update(json_publication)
+        break
+    conteudo_bruto3 = lista_chave_banco(col_dados_brutos, "items", "content")
+    for z in conteudo_bruto3:
+        json_title = {"title": z["summary"]}
+        json_summary = {"summary": z["summary"]}
+        json_title = {"url": z["url"]}
+        json_post.update(json_title)
+        json_post.update(json_summary)
+        json_post.update(json_title)
+        break
+    return json_post
+
+
+json_bruto = bruto_json(col_dados_brutos)
+print(json_bruto)
+
+"""
 # pegar os ids dos posts
 conteudo = lista_chave_banco(colecao, "items", "id")
 for x in conteudo:
     print(x)
-"""
+
+conteudo = lista_chave_banco(colecao, "items", "content")
+for x in conteudo:
+    # print(x["title"])
+    print("tamanho: ", len(x["title"]) )        
 
 
 
 
-"""
 dados = requisicao(url, 60)
 if dados is not None:
     print("dados válidos 60")
@@ -115,5 +148,3 @@ if resultado is None:
 else:
     print("Alterado com sucesso")
 """
-# inserir(colecao, 22, "fodase")
-# id_insert = colecao.insert_one(controle).inserted_id
