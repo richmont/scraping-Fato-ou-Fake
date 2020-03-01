@@ -88,31 +88,32 @@ col_posts = banco.posts
 
 
 def bruto_json(col_dados_brutos):
-    json_post = {"id": 0}
+    json_post = {}
     conteudo_bruto1 = lista_chave_banco(col_dados_brutos, "items", "id")
-    for x in conteudo_bruto1:
-        json_id = {"id": x}
-        json_post.update(json_id)
-        break
     conteudo_bruto2 = lista_chave_banco(col_dados_brutos, "items", "publication")
-    for y in conteudo_bruto2:
-        json_publication = {"publication": y}
-        json_post.update(json_publication)
-        break
     conteudo_bruto3 = lista_chave_banco(col_dados_brutos, "items", "content")
-    for z in conteudo_bruto3:
-        json_title = {"title": z["summary"]}
-        json_summary = {"summary": z["summary"]}
-        json_title = {"url": z["url"]}
-        json_post.update(json_title)
-        json_post.update(json_summary)
-        json_post.update(json_title)
+    for x in conteudo_bruto1:
+        id = x
+        # json_id = {"id": x}
+        # json_post.update(json_id)
+        for y in conteudo_bruto2:
+            json_publication = {"publication": y}
+            json_post.update(json_publication)
+            for z in conteudo_bruto3:
+                json_title = {"title": z["summary"]}
+                json_summary = {"summary": z["summary"]}
+                json_title = {"url": z["url"]}
+                json_post.update(json_title)
+                json_post.update(json_summary)
+                json_post.update(json_title)
+                break
+            break
+        inserir(col_posts, json_post, id=id)
         break
-    return json_post
 
 
-json_bruto = bruto_json(col_dados_brutos)
-print(json_bruto)
+bruto_json(col_dados_brutos)
+
 
 """
 # pegar os ids dos posts
