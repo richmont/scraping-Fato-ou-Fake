@@ -1,7 +1,4 @@
 from pymongo import MongoClient
-import json
-import requests
-url = "https://falkor-cda.bastian.globo.com/tenants/g1/instances/9a0574d8-bc61-4d35-9488-7733f754f881/posts/page/"
 
 
 def inserir(colecao, conteudo, **kwargs):
