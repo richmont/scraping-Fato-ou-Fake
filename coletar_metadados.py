@@ -32,37 +32,52 @@ def dados_posts_banco(colecao, url, paginas):
                 
                 items = json_data["items"]
                 for item in items:
-                    json_post = {}
-                    post_id = item["id"]
-                    json_titulo = {"titulo": item["content"]["title"]}
-                    json_data_publicacao = {"data_publicacao": item["publication"]}
-                    json_resumo = {"resumo": item["content"]["summary"]}
-                    json_post_url = {"post_url": item["content"]["url"]}
-                    json_post_imagem = {"post_imagem": item["content"]["image"]["url"]}
-                    json_post.update(json_titulo)
-                    json_post.update(json_data_publicacao)
-                    json_post.update(json_resumo)
-                    json_post.update(json_post_url)
-                    json_post.update(json_post_imagem)
-                    id_inserido = inserir(posts, json_post, id=post_id)
-                    if id_inserido is not None:
-                        print("Post inserido com id: ", id_inserido)
-                    else:
-                        print("inserção falhou do post com título ", json_titulo)
+                    try:
+                        json_post = {}
+                        post_id = item["id"]
+                        post_titulo = item["content"]["title"]
+                        post_data_publicacao = item["publication"]
+                        post_resumo = item["content"]["summary"]
+                        post_url = item["content"]["url"]
+                        post_imagem_url = item["content"]["image"]["url"]
+                        if post_id is None and post_titulo is not None:
+                            print("ID do post inválido")
+                            pass
+                        elif post_titulo is None:
+                            print("Título do post inválido")
+                            continue
+                        elif post_data_publicacao is None:
+                            print("Data da publicação inválida")
+                            continue
+                        elif post_resumo is None:
+                            print("Resumo do post inválido")
+                            continue
+                        elif post_url is None:
+                            print("URL do post inválido")
+                            continue
+                        elif post_imagem_url is None:
+                            print("URL da imagem do post inválida")
+                            continue
+                        
+                        json_titulo = {"titulo": post_titulo}
+                        json_data_publicacao = {"data_publicacao": post_data_publicacao}
+                        json_resumo = {"resumo": post_resumo}
+                        json_post_url = {"post_url": post_url}
+                        json_post_imagem = {"post_imagem": post_imagem_url}
+                        json_post.update(json_titulo)
+                        json_post.update(json_data_publicacao)
+                        json_post.update(json_resumo)
+                        json_post.update(json_post_url)
+                        json_post.update(json_post_imagem)
+                        
+                        id_inserido = inserir(posts, json_post, id=post_id)
+                        if id_inserido is not None:
+                            print("Post inserido com id: ", id_inserido)
+                        else:
+                            print("inserção falhou com id do post: ", post_id)
+                    except KeyError as e:
+                        print("Chave não encontrada", e)
 
-                    """
-                    json_publication = {"publication": y}
-                    json_post.update(json_publication)
-                    json_title = {"title": z["summary"]}
-                    json_summary = {"summary": z["summary"]}
-                    json_title = {"url": z["url"]}
-                    json_post.update(json_title)
-                    json_post.update(json_summary)
-                    json_post.update(json_title)
-                    break
-            break
-        inserir(col_posts, json_post, id=id)
-        """
             else:
                 # página não tem elemento "items", exibe erro e interrompe o programa
                 print("Resposta do servidor sem conteúdo na página ", x)
@@ -75,4 +90,5 @@ def dados_posts_banco(colecao, url, paginas):
 
 # endereço da API do Fato ou Fake
 url = "https://falkor-cda.bastian.globo.com/tenants/g1/instances/9a0574d8-bc61-4d35-9488-7733f754f881/posts/page/"
-dados_posts_banco(posts, url, 2)
+dados_posts_banco(posts, url, 70)
+
