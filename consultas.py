@@ -104,8 +104,7 @@ def consulta_posts_data(colecao=posts, ano=None, mes=None, dia=None, limite=10):
     data = str(ano) + "." + str(mes) + "." + str(dia)
     # print("data recebida: ", data)
     query = {'data_publicacao': {'$regex': data}}
-    #resultado = colecao.find(query).limit(limite)
-    resultado = 0
+    resultado = colecao.find(query).limit(limite)
     return resultado
 
 
