@@ -17,24 +17,26 @@ def tamanho_numero(numero):
         return None
 
 
-def consulta_campo_regex(colecao, campo, palavra, limite=10):
+def consulta_campo_regex(colecao, consulta, limite=10):
     """
     colecao (MongoDB Collection) \n
     campo (str) \n
-    palavra (str) \n
+    consulta (set) \n
     Consulta no banco filtrando pelo campo e seu conteúdo por regex
     """
-    query = {campo: {'$regex': palavra}}
-    resultado = colecao.find(query).limit(limite)
-    return resultado
+    for chave in consulta.keys():
+        query = {chave: {'$regex': consulta[chave]}}
+        resultado = colecao.find(query).limit(limite)
+        return resultado
 
 
-def consulta_posts_data(colecao=posts, ano=None, mes=None, dia=None, limite=10):
+def consulta_posts_data(colecao=posts, ano=None, mes=None, dia=None, limite=10, pular=None):
     """
     colecao (MongoDB Collection)\n
     ano (int{4}) \n
     mes (int{2}) \n
     dia (int{2}) \n
+    limite (int)
     
     Consulta no banco filtrando pela data do post
     """
@@ -102,14 +104,41 @@ def consulta_posts_data(colecao=posts, ano=None, mes=None, dia=None, limite=10):
             return None
 
     data = str(ano) + "." + str(mes) + "." + str(dia)
-    # print("data recebida: ", data)
-    query = {'data_publicacao': {'$regex': data}}
-    resultado = colecao.find(query).limit(limite)
+    # se pular é nulo ou não é um inteiro
+    if pular is None or isinstance(pular, int) is not True:
+        query = {'data_publicacao': {'$regex': data}}
+        resultado = colecao.find(query).limit(limite)
+        return resultado
+    else:
+        # consulta definindo o skip com var pular
+        query = {'data_publicacao': {'$regex': data}}
+        resultado = colecao.find(query).skip(pular).limit(limite)
+        return resultado
+
+
+def consulta_post_id(colecao, id):
+    # recebe o documento compatível com o ID informado
+    resultado = colecao.find_one({"_id": id})
     return resultado
 
 
-resultado = consulta_posts_data(colecao=posts, ano=2020, dia=31, mes=1)
-#for x in resultado:
-#    pprint(x)
+def quantidade_total(colecao, consulta=None):
+    if consulta is None:
+        # consulta vazia para retornar todos os documentos da coleção
+        resultado = colecao.count_documents({})
+        return resultado
+    else:
+        # consulta obedecendo a query recebida
+        resultado = colecao.count_documents(consulta)
+        return resultado
 
-# print(tamanho_numero(2))
+"""
+consulta = {"titulo": "#FAKE"}
+resultado = consulta_campo_regex(posts, consulta)
+for x in resultado:
+    print(x)
+
+resultado = consulta_posts_data(colecao=posts, ano=2020)
+for x in resultado:
+    pprint(x)
+"""
