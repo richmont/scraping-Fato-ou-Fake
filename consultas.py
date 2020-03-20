@@ -27,7 +27,9 @@ def consulta_campo_regex(colecao, consulta, limite=10):
     for chave in consulta.keys():
         query = {chave: {'$regex': consulta[chave]}}
         resultado = colecao.find(query).limit(limite)
-        return resultado
+        r_lista = list(resultado)
+        
+        return r_lista
 
 
 def consulta_posts_data(colecao=posts, ano=None, mes=None, dia=None, limite=10, pular=None):
@@ -135,8 +137,9 @@ def quantidade_total(colecao, consulta=None):
 """
 consulta = {"titulo": "#FAKE"}
 resultado = consulta_campo_regex(posts, consulta)
-for x in resultado:
-    print(x)
+print(resultado)
+#for x in resultado:
+#    print(x)
 
 resultado = consulta_posts_data(colecao=posts, ano=2020)
 for x in resultado:
