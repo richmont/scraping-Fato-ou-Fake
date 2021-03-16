@@ -140,8 +140,8 @@ resultado = consulta_campo_regex(posts, consulta)
 print(resultado)
 #for x in resultado:
 #    print(x)
-
+"""
 resultado = consulta_posts_data(colecao=posts, ano=2020)
 for x in resultado:
     pprint(x)
-"""
+
