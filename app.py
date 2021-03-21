@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from consultas import *
+from db.mongo import *
 
 app = Flask(__name__)
 

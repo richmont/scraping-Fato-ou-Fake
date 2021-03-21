@@ -1,6 +1,6 @@
 from pymongo import MongoClient, errors
-from banco import inserir
-from banco import alterar
+from db.mongo import inserir
+from db.mongo import alterar
 from scraping import requisicao
 import json
 from conf.settings import MONGO_URL, GLOBO_URL_INICIO, GLOBO_URL_FIM, GLOBO_ID, NUM_PAG
@@ -73,7 +73,6 @@ def dados_posts_banco(colecao, url, paginas):
                         json_post.update(json_resumo)
                         json_post.update(json_post_url)
                         #json_post.update(json_post_imagem)
-                        
                         id_inserido = inserir(posts, json_post, id=post_id)
                         if id_inserido is not None:
                             print("Post inserido com id: ", id_inserido)
