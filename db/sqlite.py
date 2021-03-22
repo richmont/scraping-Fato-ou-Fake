@@ -309,8 +309,27 @@ class Banco:
         # retorna a lista de objetos post
         return lista_posts
 
-    def quantidade_total(self, query):
-        pass
-
-cursor = conectar('posts.db')
-banco = Banco(cursor)
+    def quantidade_total(self):
+        """
+        Conta quantas entradas há no banco de dados
+        Retorna um inteiro
+        """
+        query_contar = "select count() from posts"
+        self.cursor.execute(query_contar)
+        resultado = self.cursor.fetchone()
+        return resultado[0]
+        
+    def consulta_tudo(self):
+        """
+        Consulta a tabela inteira do banco
+        Retorna lista de objetos Post
+        """
+        query_tudo = "select * from posts"
+        self.cursor.execute(query_tudo)
+        resultado = self.cursor.fetchall()
+        lista_posts = []
+        for x in resultado:
+            post = tupla_to_post(x)
+            lista_posts.append(post)
+            del post
+        return lista_posts
