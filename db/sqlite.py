@@ -7,7 +7,8 @@ import os,sys,inspect
 current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parent_dir = os.path.dirname(current_dir)
 sys.path.insert(0, parent_dir) 
-from post import Post
+#from post import Post
+from post import *
 
 def conectar(nome_arquivo):
     """
@@ -45,6 +46,7 @@ class Banco:
         _id (string)
 
         Consulta o banco e verifica se determinada entrada existe, localizando pelo id
+        retorna booleano
         """
         query_verificar_existe = f"SELECT _id from posts where _id = '{_id}'"
         self.cursor.execute(query_verificar_existe)
@@ -164,7 +166,7 @@ class Banco:
     CONSULTAS
     """
 
-    def consulta_posts_data(self, ano=None, mes=None, dia=None, limite=10, pular=None):
+    def consulta_posts_data(self, ano=None, mes=None, dia=None, limite=10, pular=None, query_secundaria = None):
         """
         ano (int{4}) \n
         mes (int{2}) \n
@@ -241,22 +243,74 @@ class Banco:
             else:
                 print("valor do dia inválido: ", dia)
                 return None
-
+        lista_posts = []
         # se pular é nulo ou não é um inteiro
         if pular == None or isinstance(pular, int) is not True:
+            if query_secundaria != None:
+                query_consulta_data = f"select * from posts where data_publicacao like '%{data}%' and {query_secundaria} limit {limite}"
+                print(query_consulta_data)
+                self.cursor.execute(query_consulta_data)
+                resultado = self.cursor.fetchall()
+                for x in resultado:
+                    post = tupla_to_post(x)
+                    lista_posts.append(post)
             query_consulta_data = f"select * from posts where data_publicacao like '%{data}%' limit {limite}"
             self.cursor.execute(query_consulta_data)
             resultado = self.cursor.fetchall()
+            for x in resultado:
+                    post = tupla_to_post(x)
+                    lista_posts.append(post)
             # caso a consulta não retorne nada, resultado será None
-            return resultado
+            return lista_posts
         else:
             
             query_consulta_data = f"select * from posts where data_publicacao like '%{data}%' limit {limite} offset {pular}"
             self.cursor.execute(query_consulta_data)
             resultado = self.cursor.fetchall()
+            for x in resultado:
+                    post = tupla_to_post(x)
+                    lista_posts.append(post)
             # caso a consulta não retorne nada, resultado será None
-            return resultado
-#cursor = conectar('posts.db')
-#banco = Banco(cursor)
-#resultado = banco.consulta_posts_data(mes=3, limite=1, pular=3)
-#print(resultado)
+            return lista_posts
+
+    def consulta_post_id(self, _id):
+        """
+        Parametros:
+        _id = (string)
+
+        Retorna um objeto Post
+        """
+        if self.existe_by_id(_id):
+            query_post_by_id = f"select * from posts where _id = '{_id}'"
+            self.cursor.execute(query_post_by_id)
+            resultado = self.cursor.fetchone()
+            post = tupla_to_post(resultado)
+            return post
+        else:
+            return None
+
+    def consulta_post_titulo(self, titulo, limite=5):
+        """
+        Parametros:
+        titulo = (string)
+
+        Retorna uma lista com objetos post localizados
+        """
+        query_post_by_titulo = f"select * from posts where titulo like '%{titulo}%' limit {limite}"
+        self.cursor.execute(query_post_by_titulo)
+        resultado = self.cursor.fetchall()
+        lista_posts = []
+        for x in resultado:
+            # para cada tupla recebida na consulta, 
+            # cria um objeto post e insere no fim da lista
+            post = tupla_to_post(x)
+            lista_posts.append(post)
+            del post
+        # retorna a lista de objetos post
+        return lista_posts
+
+    def quantidade_total(self, query):
+        pass
+
+cursor = conectar('posts.db')
+banco = Banco(cursor)
