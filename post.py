@@ -8,4 +8,3 @@ class Post:
         self.data_publicacao = conteudo['data_publicacao']
         self.resumo = conteudo['resumo']
         self.post_url = conteudo['post_url']
-    

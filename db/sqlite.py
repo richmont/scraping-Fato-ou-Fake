@@ -65,7 +65,7 @@ class Banco:
         CREATE TABLE IF NOT EXISTS posts (
                 _id TEXT NOT NULL PRIMARY KEY,
                 titulo TEXT NOT NULL,
-                data_publicacao DATETIME NOT NULL,
+                data_publicacao TEXT NOT NULL,
                 resumo     TEXT NOT NULL,
                 post_url TEXT NOT NULL
         );
@@ -83,11 +83,13 @@ class Banco:
         retorna o id da entrada inserido
         """
 
-
-        query_inserir = f"INSERT INTO posts (_id, titulo, data_publicacao, resumo, post_url) VALUES ('{post._id}','{post.titulo}','{post.data_publicacao}','{post.resumo}','{post.post_url}')"
         
+        # única maneira de evitar que textos com aspas causem erro na query é inserir desta maneira
+        # também é mais fácil, no fim das contas
+        query_inserir = f'''INSERT INTO posts (_id, titulo, data_publicacao, resumo, post_url) VALUES (?,?,?,?,?)'''
+        valores = [post._id,post.titulo,post.data_publicacao,post.resumo,post.post_url]
         try:
-            self.cursor.execute(query_inserir)
+            self.cursor.execute(query_inserir, valores)
             # cursor pode commitar a query usando o método "connection"
             # fonte: https://stackoverflow.com/questions/50429589/python-sqlite3-is-commit-used-on-the-connect-or-cursor/50429875
             self.cursor.connection.commit()
@@ -95,17 +97,17 @@ class Banco:
         except sqlite3.IntegrityError:
             print("Documento já existe no banco")
             return None
-        except sqlite3.OperationalError:
+        #except sqlite3.OperationalError:
             # exceção da ausência das tabelas, oo que impede inserção dos dados
             # necessário rodar o método "criar_tabelas" caso haja esse problema
-            print("Por favor, crie as tabelas no banco antes de inserir dados")
+            #print("Por favor, crie as tabelas no banco antes de inserir dados")
         # consulta o id recém inserido, retorna caso localize
         consulta_id_query = f"SELECT _id from posts where _id = '{post._id}'"
         self.cursor.execute(consulta_id_query)
         # consulta apenas uma entrada, é o bastante aqui
-        resultado = cursor.fetchone()
+        resultado = self.cursor.fetchone()
         # fecha o cursor após terminar de consultar o banco
-        self.cursor.close()
+        #self.cursor.close()
         # cursor retorna uma tupla, com o valor que interessa na primeira posição
         return resultado[0]
         
@@ -118,8 +120,6 @@ class Banco:
 
         Altera uma entrada já existente no banco
         localiza o campo pelo _id, o registro chave
-
-        retorna o conteúdo do campo alterado
         """
         if self.existe_by_id(_id):
             string_alteracoes = str()
@@ -159,3 +159,100 @@ class Banco:
                 print("Apagar falhou: verifique as tabelas do banco ou execute criar_tabela ", e)
         else:
             print("Apagar falhou, id não existe")
+
+    """
+    CONSULTAS
+    """
+
+    def consulta_posts_data(self, ano=None, mes=None, dia=None, limite=10, pular=None):
+        """
+        ano (int{4}) \n
+        mes (int{2}) \n
+        dia (int{2}) \n
+        limite (int)
+        
+        Consulta no banco filtrando pela data do post
+        """
+        """
+        verificação rápida se qualquer um dos valores é nulo
+        """
+
+            
+        """
+        Caso um dos valores de data seja None
+        Associa esse valor com a regex para funcionar com um range de números
+        """
+        if dia is None:
+            dia = "\d{2}"
+        else:
+            int_dia = dia
+            if self.tamanho_numero(int_dia) == 1:
+                # acrescenta 0 na frente de número de um dígito
+                dia = "0" + str(dia)
+                # dia ok com 2 digitos
+            elif self.tamanho_numero(int_dia) == 2:
+                # número no tamanho correto, dois dígitos
+                # checa se o valor do dia está no alcance de dias normais
+                if int_dia < 1 or int_dia > 31:
+                    # retorna None e termina
+                    print("valor do dia inválido: ", dia)
+                    return None
+            else:
+                print("valor do dia inválido: ", dia)
+                return None
+        if mes is None:
+            mes = "\d{2}"
+        else:
+            int_mes = mes
+            if self.tamanho_numero(int_mes) == 1:
+                # acrescenta 0 na frente de número de um dígito
+                mes = "0" + str(mes)
+                # mes ok com 2 digitos
+            elif self.tamanho_numero(int_mes) == 2:
+                # número no tamanho correto, dois dígitos
+                # checa se o valor do mes está no alcance de mess normais
+                if int_mes < 1 or int_mes > 12:
+                    # retorna None e termina
+                    print("valor do mes inválido: ", mes)
+                    return None
+            else:
+                print("valor do mes inválido: ", mes)
+                return None
+
+        if ano is None:
+            ano = "\d{4}"
+        else:
+            int_ano = ano
+            if self.tamanho_numero(int_ano) == 2:
+                ano = "20" + str(ano)
+                # ano ok com 4 digitos
+            elif self.tamanho_numero(int_ano) == 4:
+                # número no tamanho correto, dois dígitos
+                # checa se o valor do ano está no alcance de anos normais
+                if int_ano < 1900 or int_ano > 3000:
+                    print("valor do ano inválido: ", ano)
+                    return None
+            else:
+                print("valor do ano inválido: ", ano)
+                return None
+
+        data = str(ano) + "-" + str(mes) + "-" + str(dia)
+        # se pular é nulo ou não é um inteiro
+        if pular == None or isinstance(pular, int) is not True:
+            query_consulta_data = f"select * from posts where 'data_publicacao' like '{data}' limit '{limite}'"
+            self.cursor.execute(query_consulta_data)
+            resultado = self.cursor.fetchall()
+            # caso a consulta não retorne nada, resultado será None
+            return resultado
+        else:
+            pass
+            query_consulta_data = f"select * from posts where 'data_publicacao' like '{data}' limit '{limite}' offset '{pular}'"
+            self.cursor.execute(query_consulta_data)
+            resultado = self.cursor.fetchall()
+            # caso a consulta não retorne nada, resultado será None
+            return resultado
+#cursor = conectar('posts.db')
+#banco = Banco(cursor)
+#resultado = banco.consulta_posts_data(ano=2021)
+#banco.cursor.execute(f"select * from posts where 'data_publicacao' like '2021%'")
+#print(banco.cursor.fetchall())
