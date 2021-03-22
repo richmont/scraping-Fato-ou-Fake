@@ -169,37 +169,37 @@ class Banco:
         ano (int{4}) \n
         mes (int{2}) \n
         dia (int{2}) \n
-        limite (int)
+        limite (int) \n
+        pular (int)
         
         Consulta no banco filtrando pela data do post
-        """
-        """
-        verificação rápida se qualquer um dos valores é nulo
-        """
 
-            
-        """
+        verificação rápida se qualquer um dos valores é nulo
+
         Caso um dos valores de data seja None
         Associa esse valor com a regex para funcionar com um range de números
         """
-        if dia is None:
-            dia = "\d{2}"
+        data = ""
+        if ano is None:
+            ano = "\d{4}"
         else:
-            int_dia = dia
-            if self.tamanho_numero(int_dia) == 1:
-                # acrescenta 0 na frente de número de um dígito
-                dia = "0" + str(dia)
-                # dia ok com 2 digitos
-            elif self.tamanho_numero(int_dia) == 2:
+            int_ano = ano
+            if self.tamanho_numero(int_ano) == 2:
+                ano = "20" + str(ano)
+                # ano ok com 4 digitos
+            elif self.tamanho_numero(int_ano) == 4:
                 # número no tamanho correto, dois dígitos
-                # checa se o valor do dia está no alcance de dias normais
-                if int_dia < 1 or int_dia > 31:
-                    # retorna None e termina
-                    print("valor do dia inválido: ", dia)
+                # checa se o valor do ano está no alcance de anos normais
+                if int_ano < 1900 or int_ano > 3000:
+                    print("valor do ano inválido: ", ano)
                     return None
+                else:
+                    # se o valor de ano passou nas checagens, concatena na data, começando pelo ano
+                    data += str(ano )
             else:
-                print("valor do dia inválido: ", dia)
+                print("valor do ano inválido: ", ano)
                 return None
+        
         if mes is None:
             mes = "\d{2}"
         else:
@@ -215,44 +215,48 @@ class Banco:
                     # retorna None e termina
                     print("valor do mes inválido: ", mes)
                     return None
+                else:
+                    data += "-"+str(mes)
             else:
                 print("valor do mes inválido: ", mes)
                 return None
 
-        if ano is None:
-            ano = "\d{4}"
+        if dia is None:
+            dia = "\d{2}"
         else:
-            int_ano = ano
-            if self.tamanho_numero(int_ano) == 2:
-                ano = "20" + str(ano)
-                # ano ok com 4 digitos
-            elif self.tamanho_numero(int_ano) == 4:
+            int_dia = dia
+            if self.tamanho_numero(int_dia) == 1:
+                # acrescenta 0 na frente de número de um dígito
+                dia = "0" + str(dia)
+                # dia ok com 2 digitos
+            elif self.tamanho_numero(int_dia) == 2:
                 # número no tamanho correto, dois dígitos
-                # checa se o valor do ano está no alcance de anos normais
-                if int_ano < 1900 or int_ano > 3000:
-                    print("valor do ano inválido: ", ano)
+                # checa se o valor do dia está no alcance de dias normais
+                if int_dia < 1 or int_dia > 31:
+                    # retorna None e termina
+                    print("valor do dia inválido: ", dia)
                     return None
+                else:
+                    data += "-"+str(dia)
             else:
-                print("valor do ano inválido: ", ano)
+                print("valor do dia inválido: ", dia)
                 return None
 
-        data = str(ano) + "-" + str(mes) + "-" + str(dia)
         # se pular é nulo ou não é um inteiro
         if pular == None or isinstance(pular, int) is not True:
-            query_consulta_data = f"select * from posts where 'data_publicacao' like '{data}' limit '{limite}'"
+            query_consulta_data = f"select * from posts where data_publicacao like '%{data}%' limit {limite}"
             self.cursor.execute(query_consulta_data)
             resultado = self.cursor.fetchall()
             # caso a consulta não retorne nada, resultado será None
             return resultado
         else:
-            pass
-            query_consulta_data = f"select * from posts where 'data_publicacao' like '{data}' limit '{limite}' offset '{pular}'"
+            
+            query_consulta_data = f"select * from posts where data_publicacao like '%{data}%' limit {limite} offset {pular}"
             self.cursor.execute(query_consulta_data)
             resultado = self.cursor.fetchall()
             # caso a consulta não retorne nada, resultado será None
             return resultado
 #cursor = conectar('posts.db')
 #banco = Banco(cursor)
-#resultado = banco.consulta_posts_data(ano=2021)
-#banco.cursor.execute(f"select * from posts where 'data_publicacao' like '2021%'")
-#print(banco.cursor.fetchall())
+#resultado = banco.consulta_posts_data(mes=3, limite=1, pular=3)
+#print(resultado)
