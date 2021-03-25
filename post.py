@@ -12,6 +12,8 @@ class Post:
 """
 Métodos para facilitar a criação de objetos Post
 """
+
+
 def tupla_to_post(tupla):
     """
     SQlite retorna tuplas das consultas

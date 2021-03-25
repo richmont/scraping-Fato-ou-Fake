@@ -49,8 +49,8 @@ class Coletor_metadados:
                             json_post = {}
                             post_id = item["id"]
                             post_titulo = item["content"]["title"]
-                            post_titulo.replace("'","''")
-                            print(post_titulo)
+                            #post_titulo.replace("'","''")
+                            
                             
                             post_data_publicacao = item["publication"]
                             post_resumo = item["content"]["summary"]
@@ -75,36 +75,34 @@ class Coletor_metadados:
                             json_data_publicacao = {"data_publicacao": post_data_publicacao}
                             json_resumo = {"resumo": post_resumo}
                             json_post_url = {"post_url": post_url}
-                            
                             json_post.update(json_id)
                             json_post.update(json_titulo)
                             json_post.update(json_data_publicacao)
                             json_post.update(json_resumo)
                             json_post.update(json_post_url)
-                            
-                            #print(json_post)
-                            #print(post_id)
-                            
+                            # cria um objeto post com o conteúdo coletado em json
                             post = Post(json_post)
-                            #print(post.titulo)
+                            
                             if self.sgbd == 'sqlite':
                                 # inicializa a variavel caso ela não seja ocupada por causa de exceção
                                 id_inserido = None
-                                #try:
-                                id_inserido = banco_sqlite.inserir(post)
-                                #except TypeError:
-                                    #print("inserção falhou com id do post: ", post_id)
+                                try:
+                                    id_inserido = banco_sqlite.inserir(post)
+                                except TypeError:
+                                    print("inserção falhou com id do post: ", post_id)
                                 if id_inserido == None:
                                     print("inserção falhou com id do post: ", post_id)
+                                # se retornou um id não vazio, inserção ocorreu sem problemas
                                 else:
                                     print("Post inserido com id: ", id_inserido)
-
+                            """
+                            Comentar o trecho que trata do mongo, pois não vamos usar por enquanto
                             elif self.sgbd == 'mongodb':
                                 pass
                             else:
                                 print("SGBD inválido, não consigo salvar os dados")
                                 break
-                            """
+                            
                             if id_inserido is not None:
                                 print("Post inserido com id: ", id_inserido)
                             else:
